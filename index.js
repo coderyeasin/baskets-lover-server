@@ -89,17 +89,39 @@ async function server() {
         //Add Admin role
         app.put('/orders/admin', async (req, res) => {
             const order = req.body;
+            console.log(req.headers);
             const filter = { email: order.email };
             const updateDoc = { $set: { role: 'admin' } };
             const result = await ordersCollection.updateOne(filter, updateDoc)
             res.json(result)
         })
+        //update status
+        app.put('/updateStatus/:id', (req, res) => {
+            const id = req.params.id;
+            const updateStatus = req.body.status;
+            const filter = { _id: ObjectId(id) }
+            console.log(updateStatus);
+            ordersCollection.updateOne(filter, {
+                $set: {status: updateStatus},
+            })
+                .then(result => {
+                res.send(result);
+            })
+        })
 
-        //delete api
+        //delete api -user
         app.delete('/orders/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await ordersCollection.deleteOne(query)
+            res.json(result)
+        })
+
+        //delete api --admin products
+        app.delete('/items/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await basketsCollection.deleteOne(query)
             res.json(result)
         })
 
